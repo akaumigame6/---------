@@ -216,7 +216,7 @@ class OthelloGame:
     def is_game_over(self):
         """ ゲームが終了したかを判定 """
         if all(cell != 0 for cell in self.board):
-            return True
+            return not self.get_valid_moves()
         if self.turns_passed >= 2:return False
         return not self.get_valid_moves()
 
@@ -240,6 +240,17 @@ class OthelloGame:
                     temp.append("+")
             print(" ".join(temp))
 
+def get_move_input():
+    while True:
+        try:
+            x, y = map(int, input("行列指定 >> ").split())
+            if 0 <= x < 8 and 0 <= y < 8:  # 入力された位置が盤面内か確認
+                return x, y
+            else:
+                print("入力エラー: 盤面の範囲（0-7）で入力してください。")
+        except ValueError:
+            print("入力エラー: 2つの整数をスペースで区切って入力してください。")
+
 #メイン関数
 def main():
     # ゲームのセットアップ
@@ -249,14 +260,16 @@ def main():
     # AI vs 人間の対戦
     while not game.is_game_over():
         game.print_board()  # 盤面を表示
-
         while True:
+            if game.turns_passed >= 2:
+                break
             moves=game.get_valid_moves()
             if len(moves)==0:
                 print("Pass")
                 game.pass_turn()
+                continue
             if game.current_player == 1:  # 人間プレイヤー（黒）
-                x, y = map(int, input("  行列指定 >> ").split())
+                x, y = get_move_input()
                 move=x*8+y
             else:  # AIプレイヤー（白）
                 print("AIが思考中...")
